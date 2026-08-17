@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>WordRift – Word Scrambler & Arrangement Generator</title>
+
+  <meta name="description"
+        content="WordRift is a free word scrambler and arrangement generator for letters, words, and numbers. Generate possible arrangements and discover valid words instantly.">
+
+  <meta name="robots" content="index, follow">
+
+  <meta name="author" content="WordRift">
+
+  <!-- Open Graph -->
+  <meta property="og:title"
+        content="WordRift – Word Scrambler & Arrangement Generator">
+
+  <meta property="og:description"
+        content="Generate possible arrangements, scramble letters, and discover valid words instantly.">
+
+  <meta property="og:type"
+        content="website">
+
+  <meta property="og:url"
+        content="YOUR-SITE-URL">
+
+  <meta property="og:image"
+        content="YOUR-SITE-URL/assets/wordrift-preview.png">
+
+  <!-- Canonical -->
+  <link rel="canonical"
+        href="YOUR-SITE-URL">
+
+  <!-- Favicon -->
+  <link rel="icon"
+        type="image/svg+xml"
+        href="Logo.png">
+
+<link rel="stylesheet" href="Styles.css">
+</head>
+
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="#generator"><img src="Logo.png" width="25px" height="25px"> WordRift</a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#generator">Generator</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#examples">Examples</a>
+      </nav>
+      <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle dark mode">☾</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="hero">
+        <div class="eyebrow">100% browser-based</div>
+        <h1>WordRift</h1>
+        <p>Break words, letters, and numbers apart. Discover every possible arrangement.</p>
+      </section>
+
+      <section id="generator" class="card generator-card" aria-labelledby="generator-title">
+        <h2 id="generator-title" class="sr-only">Permutation Generator</h2>
+
+        <label for="input">Enter your items</label>
+        <textarea id="input" spellcheck="false" placeholder="Try ABC, AAB, 123, or RED BLUE GREEN"></textarea>
+
+        <div class="controls">
+          <div class="control-group">
+            <label for="inputType">Input type</label>
+            <select id="inputType">
+              <option value="characters">Characters</option>
+              <option value="words">Words</option>
+              <option value="numbers">Numbers</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="generationMode">Generation mode</label>
+            <select id="generationMode">
+              <option value="all">Every arrangement</option>
+              <option value="random">Random arrangements</option>
+              <option value="words">Valid words</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="limit">Maximum displayed results</label>
+            <select id="limit">
+              <option value="100">100</option>
+              <option value="500">500</option>
+              <option value="1000" selected>1,000</option>
+              <option value="5000">5,000</option>
+              <option value="10000">10,000</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="checkbox-row">
+          <label class="check">
+            <input type="checkbox" id="removeDuplicates" checked>
+            Remove duplicate permutations
+          </label>
+        </div>
+
+        <div class="dictionary-status" id="dictionaryStatus" style="margin-top:10px;font-size:.9rem;opacity:.75;">Dictionary mode uses the bundled word list first and a live dictionary fallback when needed.</div>
+        <div id="wshAttribution" style="margin-top:8px;font-size:.78rem;opacity:.65;">
+          Live word definitions/validation powered by <a href="https://wordsohard.com" target="_blank" rel="noopener noreferrer">WordSoHard</a>.
+        </div>
+
+        <div class="formula" id="modeHint" style="margin-top:14px;">
+          Every arrangement shows all unique orders your input can form.
+        </div>
+
+        <div class="button-row">
+          <button class="btn btn-primary" id="generateBtn" type="button">Generate Permutations</button>
+          <button class="btn" id="randomBtn" type="button">Random Permutations</button>
+          <button class="btn btn-danger" id="clearBtn" type="button">Clear</button>
+        </div>
+
+        <div id="status" class="status" role="status" aria-live="polite"></div>
+
+        <div class="stats">
+          <div class="stat">
+            <span>Items</span>
+            <strong id="itemCount">0</strong>
+          </div>
+          <div class="stat">
+            <span>Unique permutations</span>
+            <strong id="totalCount">0</strong>
+          </div>
+          <div class="stat">
+            <span>Currently shown</span>
+            <strong id="shownCount">0</strong>
+          </div>
+        </div>
+
+        <div class="formula" id="formula">Enter something above to calculate the permutation formula.</div>
+
+        <div class="examples" id="examples">
+          <button class="example" data-value="ABC" data-type="characters">ABC</button>
+          <button class="example" data-value="AAB" data-type="characters">AAB</button>
+          <button class="example" data-value="123" data-type="numbers">123</button>
+          <button class="example" data-value="RED BLUE GREEN" data-type="words">RED BLUE GREEN</button>
+        </div>
+      </section>
+
+      <div class="ads-banner" aria-label="Advertisement placeholder">Advertisement</div>
+
+      <section class="card results-card" aria-labelledby="results-title">
+        <div class="results-head">
+          <h2 id="results-title">Generated Permutations</h2>
+          <div class="result-tools">
+            <input id="search" type="text" placeholder="Search generated permutations…" aria-label="Search generated permutations">
+            <button class="btn" id="copyAllBtn" type="button">Copy All</button>
+          </div>
+        </div>
+
+        <div class="results-meta" id="resultsMeta">No permutations generated yet.</div>
+
+        <div class="results-box" id="resultsBox">
+          <div class="empty">Your generated permutations will appear here.</div>
+        </div>
+
+        <div class="button-row" style="padding: 0 20px 20px;">
+          <button class="btn" id="downloadBtn" type="button">Download Results</button>
+          <button class="btn" id="sortAlphaBtn" type="button">Sort A–Z</button>
+          <button class="btn" id="sortReverseBtn" type="button">Sort Z–A</button>
+          <button class="btn" id="sortRandomBtn" type="button">Shuffle Display</button>
+        </div>
+      </section>
+
+      <section class="info" id="how-it-works">
+        <h1>How it works.</h1>
+        <hr>
+        <h2>Simple! It uses Permutation</h2>
+        <h2>What is a permutation?</h2>
+        <p>A permutation is an arrangement of items where the order matters. If you have three different characters, ABC, each different ordering is a separate permutation.</p>
+
+        <div class="formula-example">
+          <strong>ABC</strong><br>
+          3! = 3 × 2 × 1 = <strong>6</strong>
+        </div>
+
+        <p>When items repeat, the repeated items must be accounted for so that identical arrangements are not counted more than once.</p>
+
+        <div class="formula-example">
+          <strong>AAB</strong><br>
+          3! ÷ 2! = 6 ÷ 2 = <strong>3</strong>
+        </div>
+
+        <p>This calculator handles repeated characters, words, and numbers automatically when duplicate removal is enabled.</p>
+
+        <div class="formula-example">
+          <strong>Choose your mode</strong><br><br>
+          <strong>Every arrangement</strong> — shows every possible order your input can form.<br>
+          <strong>Random arrangements</strong> — creates random samples without trying to enumerate everything.<br>
+          <strong>Valid words</strong> — checks generated letter arrangements against WordRift's built-in starter dictionary.
+        </div>
+
+        <p><strong>Note:</strong> Valid-word mode is intentionally limited to the words bundled into this static page. It does not send your input to a server or use an API. This keeps WordRift fully browser-only.</p>
+      </section>
+
+      <div class="ads-banner" aria-label="Advertisement placeholder">Advertisement</div>
+
+      <section class="info" id="examples">
+        <h2>Permutation examples</h2>
+        <p><strong>ABC</strong> has 6 unique arrangements. <strong>ABCD</strong> has 24. As the number of items grows, the number of possible arrangements grows extremely quickly, so this tool limits displayed results to keep your browser responsive.</p>
+        <p>For very large inputs, use <strong>Random Permutations</strong> to create a useful sample without trying to generate every possible arrangement.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      WordRift · Runs entirely in your browser. No account or upload required.
+    </div>
+  </footer>
+
+  <script>
+    "use strict";
+
+    const $ = (id) => document.getElementById(id);
+
+    const inputEl = $("input");
+    const typeEl = $("inputType");
+    const generationModeEl = $("generationMode");
+    const limitEl = $("limit");
+    const modeHintEl = $("modeHint");
+    const dictionaryStatusEl = $("dictionaryStatus");
+    const removeDuplicatesEl = $("removeDuplicates");
+    const generateBtn = $("generateBtn");
+    const randomBtn = $("randomBtn");
+    const clearBtn = $("clearBtn");
+    const statusEl = $("status");
+    const itemCountEl = $("itemCount");
+    const totalCountEl = $("totalCount");
+    const shownCountEl = $("shownCount");
+    const formulaEl = $("formula");
+    const resultsBox = $("resultsBox");
+    const resultsMeta = $("resultsMeta");
+    const searchEl = $("search");
+    const copyAllBtn = $("copyAllBtn");
+    const downloadBtn = $("downloadBtn");
+    const themeToggle = $("themeToggle");
+
+    let generatedResults = [];
+    let totalPermutationCount = 0n;
+    let currentInputItems = [];
+
+    function formatBigInt(n) {
+      return n.toLocaleString("en-US");
+    }
+
+    function factorial(n) {
+      let result = 1n;
+      for (let i = 2n; i <= BigInt(n); i++) result *= i;
+      return result;
+    }
+
+    function getItems() {
+      const raw = inputEl.value.trim();
+
+      if (!raw) return [];
+
+      if (typeEl.value === "characters") {
+        return Array.from(raw.replace(/\s+/g, ""));
+      }
+
+      if (typeEl.value === "numbers") {
+        return raw.split(/[\s,]+/).filter(Boolean);
+      }
+
+      return raw.split(/\s+/).filter(Boolean);
+    }
+
+    function countUniquePermutations(items) {
+      const frequencies = new Map();
+
+      for (const item of items) {
+        frequencies.set(item, (frequencies.get(item) || 0) + 1);
+      }
+
+      let result = factorial(items.length);
+
+      for (const count of frequencies.values()) {
+        result /= factorial(count);
+      }
+
+      return result;
+    }
+
+    function makeFormula(items) {
+      if (!items.length) {
+        return "Enter something above to calculate the permutation formula.";
+      }
+
+      const frequencies = new Map();
+      items.forEach(x => frequencies.set(x, (frequencies.get(x) || 0) + 1));
+
+      const n = items.length;
+      const numerator = factorial(n);
+
+      const repeated = [...frequencies.values()].filter(x => x > 1);
+
+      if (!repeated.length) {
+        return `${n}! = ${formatBigInt(numerator)} possible arrangements`;
+      }
+
+      const denominator = repeated.map(x => `${x}!`).join(" × ");
+      return `${n}! ÷ (${denominator}) = ${formatBigInt(numerator / repeated.reduce((a, x) => a * factorial(x), 1n))} unique arrangements`;
+    }
+
+    function setStatus(message = "", type = "") {
+      statusEl.textContent = message;
+      statusEl.className = "status" + (type ? " " + type : "");
+    }
+
+    function updateStats() {
+      const items = getItems();
+      currentInputItems = items;
+
+      itemCountEl.textContent = items.length.toLocaleString();
+      totalCountEl.textContent = formatBigInt(items.length ? countUniquePermutations(items) : 0n);
+      shownCountEl.textContent = generatedResults.length.toLocaleString();
+      formulaEl.textContent = makeFormula(items);
+    }
+
+    function renderResults() {
+      const query = searchEl.value.trim().toLowerCase();
+      const visible = query
+        ? generatedResults.filter(x => x.toLowerCase().includes(query))
+        : generatedResults;
+
+      shownCountEl.textContent = visible.length.toLocaleString();
+
+      if (!generatedResults.length) {
+        resultsBox.innerHTML = '<div class="empty">Your generated permutations will appear here.</div>';
+        resultsMeta.textContent = "No permutations generated yet.";
+        return;
+      }
+
+      resultsMeta.textContent =
+        `Showing ${generatedResults.length.toLocaleString()} generated result${generatedResults.length === 1 ? "" : "s"}${query ? ` · ${visible.length.toLocaleString()} match${visible.length === 1 ? "" : "es"}` : ""} of ${formatBigInt(totalPermutationCount)} possible unique permutations.`;
+
+      if (!visible.length) {
+        resultsBox.innerHTML = '<div class="empty">No generated permutation matches your search.</div>';
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+
+      visible.forEach((value) => {
+        const row = document.createElement("div");
+        row.className = "result-item";
+
+        const code = document.createElement("code");
+        code.textContent = value;
+
+        const button = document.createElement("button");
+        button.className = "copy-one";
+        button.type = "button";
+        button.textContent = "Copy";
+        button.addEventListener("click", async () => {
+          const ok = await copyText(value);
+          button.textContent = ok ? "Copied!" : "Failed";
+          setTimeout(() => button.textContent = "Copy", 900);
+        });
+
+        row.append(code, button);
+        fragment.appendChild(row);
+      });
+
+      resultsBox.innerHTML = "";
+      resultsBox.appendChild(fragment);
+    }
+
+    // WordRift dictionary: lazy-loaded, length-sharded JSON files.
+    // Files are kept outside index.html so the main page stays small.
+    let dictionaryCache = new Map();
+    let dictionaryLoading = new Map();
+
+    async function loadDictionaryShard(length) {
+      if (dictionaryCache.has(length)) return dictionaryCache.get(length);
+      if (dictionaryLoading.has(length)) return dictionaryLoading.get(length);
+
+      const promise = fetch(`dictionary/${length}.json`)
+        .then(response => {
+          if (!response.ok) throw new Error(`Dictionary shard ${length} not found.`);
+          return response.json();
+        })
+        .then(words => {
+          const set = new Set(words);
+          dictionaryCache.set(length, set);
+          dictionaryLoading.delete(length);
+          return set;
+        })
+        .catch(error => {
+          dictionaryLoading.delete(length);
+          throw error;
+        });
+
+      dictionaryLoading.set(length, promise);
+      return promise;
+    }
+
+    // --- WordSoHard live dictionary integration ---
+    // Keyless + CORS-enabled endpoint. We use it as a live fallback rather
+    // than firing an API request for every permutation at once.
+    const WSH_API = "https://wordsohard.com/api/v1/define/";
+    const WSH_CONCURRENCY = 4;
+    const WSH_MIN_DELAY_MS = 1100; // stays comfortably below ~60 req/min/IP
+    const liveWordCache = new Map();
+    let lastWshRequestAt = 0;
+
+    const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    async function validateWordWithWordSoHard(word) {
+      const normalized = word.toLowerCase();
+
+      if (liveWordCache.has(normalized)) {
+        return liveWordCache.get(normalized);
+      }
+
+      const wait = Math.max(0, WSH_MIN_DELAY_MS - (Date.now() - lastWshRequestAt));
+      if (wait) await sleep(wait);
+
+      lastWshRequestAt = Date.now();
+
+      try {
+        const response = await fetch(
+          WSH_API + encodeURIComponent(normalized),
+          {
+            method: "GET",
+            headers: { "Accept": "application/json" }
+          }
+        );
+
+        if (!response.ok) {
+          liveWordCache.set(normalized, false);
+          return false;
+        }
+
+        const data = await response.json();
+        const valid = Boolean(data?.found && data?.scrabble?.valid);
+        liveWordCache.set(normalized, valid);
+        return valid;
+      } catch {
+        // Keep the failure local. WordRift still works with its static
+        // dictionary if the external service is unavailable.
+        return false;
+      }
+    }
+
+    async function validateCandidatesLive(candidates, maxResults) {
+      const results = [];
+      let cursor = 0;
+
+      async function worker() {
+        while (cursor < candidates.length && results.length < maxResults) {
+          const current = candidates[cursor++];
+          if (await validateWordWithWordSoHard(current)) {
+            results.push(current);
+          }
+        }
+      }
+
+      await Promise.all(
+        Array.from(
+          { length: Math.min(WSH_CONCURRENCY, candidates.length) },
+          worker
+        )
+      );
+
+      return results;
+    }
+
+    async function getValidWordResults(items, maxResults) {
+      if (typeEl.value !== "characters") {
+        setStatus("Valid-word mode works with characters. Switch Input Type to Characters.", "error");
+        return [];
+      }
+
+      const letters = items.join("").toLowerCase();
+
+      if (letters.length < 2) {
+        setStatus("Enter at least 2 letters for Valid Words mode.", "error");
+        return [];
+      }
+
+      // The number of permutations explodes factorially. Keep live API work
+      // bounded. The static engine remains available for Every Arrangement.
+      if (letters.length > 8) {
+        setStatus(
+          "Live dictionary mode is limited to 8 letters. Use Every Arrangement for larger inputs.",
+          "error"
+        );
+        return [];
+      }
+
+      // First use the matching local shard if it exists and contains data.
+      let localMatches = [];
+      try {
+        const dictionary = await loadDictionaryShard(letters.length);
+        if (dictionary.size) {
+          const permutations = generatePermutations(
+            items,
+            Math.min(maxResults * 20, 50000)
+          );
+
+          for (const permutation of permutations) {
+            const word = permutation.toLowerCase();
+            if (dictionary.has(word) && !localMatches.includes(permutation)) {
+              localMatches.push(permutation);
+              if (localMatches.length >= maxResults) break;
+            }
+          }
+        }
+      } catch {
+        // Continue to live lookup.
+      }
+
+      if (localMatches.length >= maxResults) {
+        return localMatches;
+      }
+
+      // Generate only the remaining candidates and ask WordSoHard to validate
+      // them. This is intentionally bounded to avoid API abuse and UI freezes.
+      const candidateLimit = Math.min(
+        Math.max(maxResults * 12, 100),
+        2500
+      );
+
+      const candidates = generatePermutations(items, candidateLimit)
+        .filter(word => !localMatches.includes(word));
+
+      const liveMatches = await validateCandidatesLive(
+        candidates,
+        maxResults - localMatches.length
+      );
+
+      return [...localMatches, ...liveMatches];
+    }
+
+
+    function generatePermutations(items, maxResults) {
+      const results = [];
+      const n = items.length;
+
+      if (!n) return results;
+
+      // Sorting lets us skip duplicates without a Set containing every possible result.
+      const arr = [...items].sort((a, b) => String(a).localeCompare(String(b)));
+
+      function backtrack() {
+        if (results.length >= maxResults) return;
+
+        if (path.length === n) {
+          results.push(formatPermutation(path));
+          return;
+        }
+
+        for (let i = 0; i < n; i++) {
+          if (used[i]) continue;
+
+          if (i > 0 && arr[i] === arr[i - 1] && !used[i - 1]) continue;
+
+          used[i] = true;
+          path.push(arr[i]);
+
+          backtrack();
+
+          path.pop();
+          used[i] = false;
+
+          if (results.length >= maxResults) return;
+        }
+      }
+
+      const used = new Array(n).fill(false);
+      const path = [];
+
+      backtrack();
+      return results;
+    }
+
+    function formatPermutation(path) {
+      return typeEl.value === "characters" ? path.join("") : path.join(" ");
+    }
+
+    function randomPermutation(items) {
+      const arr = [...items];
+
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+
+      return formatPermutation(arr);
+    }
+
+    function generateRandomResults(items, amount) {
+      if (!items.length) return [];
+
+      const unique = new Set();
+      const total = countUniquePermutations(items);
+
+      // There is no reason to request more unique samples than possible.
+      const target = total < BigInt(amount) ? Number(total) : amount;
+
+      let attempts = 0;
+      const maxAttempts = Math.max(target * 30, 100);
+
+      while (unique.size < target && attempts < maxAttempts) {
+        unique.add(randomPermutation(items));
+        attempts++;
+      }
+
+      return [...unique];
+    }
+
+    async function yieldToBrowser() {
+      return new Promise(resolve => setTimeout(resolve, 0));
+    }
+
+    async function generate() {
+      const items = getItems();
+
+      if (!items.length) {
+        generatedResults = [];
+        updateStats();
+        renderResults();
+        setStatus("Enter at least one character, word, or number.", "error");
+        return;
+      }
+
+      const limit = Number(limitEl.value);
+      const mode = generationModeEl.value;
+
+      totalPermutationCount = countUniquePermutations(items);
+      updateStats();
+
+      generateBtn.disabled = true;
+      generateBtn.textContent = "Generating…";
+      setStatus("Generating…");
+
+      await yieldToBrowser();
+
+      try {
+        if (mode === "random") {
+          generatedResults = generateRandomResults(items, Math.min(limit, 1000));
+          renderResults();
+          setStatus(`Generated ${generatedResults.length.toLocaleString()} random unique arrangements.`, "success");
+          return;
+        }
+
+        if (mode === "words") {
+          try {
+            generatedResults = await getValidWordResults(items, limit);
+          } catch (error) {
+            generatedResults = [];
+            renderResults();
+            setStatus("The dictionary could not be loaded. If you're testing locally, use a local server instead of opening index.html directly.", "error");
+            return;
+          }
+          renderResults();
+
+          if (generatedResults.length) {
+            setStatus(`Found ${generatedResults.length.toLocaleString()} valid word${generatedResults.length === 1 ? "" : "s"} using the WordRift + WordSoHard dictionary system.`, "success");
+          } else if (typeEl.value === "characters" && items.length <= 9) {
+            setStatus("No matching words were found in the built-in dictionary.", "error");
+          }
+          return;
+        }
+
+        if (items.length > 11) {
+          generatedResults = generateRandomResults(items, limit);
+          renderResults();
+          setStatus(
+            `This input has ${formatBigInt(totalPermutationCount)} unique permutations. A safe random sample was generated instead of exhaustively enumerating them.`,
+            "success"
+          );
+          return;
+        }
+
+        generatedResults = generatePermutations(items, limit);
+        renderResults();
+
+        const limited = totalPermutationCount > BigInt(limit);
+
+        setStatus(
+          limited
+            ? `Generated ${generatedResults.length.toLocaleString()} of ${formatBigInt(totalPermutationCount)} possible arrangements.`
+            : `Generated all ${formatBigInt(totalPermutationCount)} unique arrangements.`,
+          "success"
+        );
+      } finally {
+        generateBtn.disabled = false;
+        generateBtn.textContent = "Generate Permutations";
+      }
+    }
+
+
+    function generateRandom() {
+      const items = getItems();
+
+      if (!items.length) {
+        setStatus("Enter something before generating random permutations.", "error");
+        return;
+      }
+
+      totalPermutationCount = countUniquePermutations(items);
+
+      const amount = Math.min(Number(limitEl.value), 1000);
+      generatedResults = generateRandomResults(items, amount);
+
+      renderResults();
+      updateStats();
+
+      setStatus(
+        `Generated ${generatedResults.length.toLocaleString()} random unique permutation${generatedResults.length === 1 ? "" : "s"}.`,
+        "success"
+      );
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch {
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.style.position = "fixed";
+        area.style.opacity = "0";
+        document.body.appendChild(area);
+        area.select();
+        let success = false;
+        try { success = document.execCommand("copy"); } catch {}
+        area.remove();
+        return success;
+      }
+    }
+
+    async function copyAll() {
+      const query = searchEl.value.trim().toLowerCase();
+      const visible = query
+        ? generatedResults.filter(x => x.toLowerCase().includes(query))
+        : generatedResults;
+
+      if (!visible.length) {
+        setStatus("There are no results to copy.", "error");
+        return;
+      }
+
+      const ok = await copyText(visible.join("\n"));
+      setStatus(ok ? `Copied ${visible.length.toLocaleString()} result${visible.length === 1 ? "" : "s"}.` : "Copy failed.", ok ? "success" : "error");
+    }
+
+    function downloadResults() {
+      if (!generatedResults.length) {
+        setStatus("Generate some permutations before downloading.", "error");
+        return;
+      }
+
+      const text = generatedResults.join("\n") + "\n";
+      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+
+      const rawName = inputEl.value.trim().replace(/[^a-z0-9_-]+/gi, "-").replace(/^-|-$/g, "").slice(0, 50) || "results";
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `permutations-${rawName}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setStatus("Results downloaded as a text file.", "success");
+    }
+
+    function clearAll() {
+      inputEl.value = "";
+      generatedResults = [];
+      totalPermutationCount = 0n;
+      currentInputItems = [];
+      searchEl.value = "";
+      updateStats();
+      renderResults();
+      setStatus("");
+    }
+
+    function sortAlpha() {
+      generatedResults.sort((a, b) => a.localeCompare(b));
+      renderResults();
+    }
+
+    function sortReverse() {
+      generatedResults.sort((a, b) => b.localeCompare(a));
+      renderResults();
+    }
+
+    function shuffleDisplay() {
+      for (let i = generatedResults.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [generatedResults[i], generatedResults[j]] = [generatedResults[j], generatedResults[i]];
+      }
+      renderResults();
+    }
+
+    function updateModeHint() {
+      const mode = generationModeEl.value;
+
+      if (mode === "all") {
+        modeHintEl.textContent = "Every arrangement shows all unique orders your input can form.";
+        dictionaryStatusEl.textContent = "Dictionary is not loaded.";
+        generateBtn.textContent = "Generate Arrangements";
+      } else if (mode === "random") {
+        modeHintEl.textContent = "Random arrangements are useful for very large inputs because the browser does not need to generate every possible order.";
+        dictionaryStatusEl.textContent = "Dictionary is not loaded.";
+        generateBtn.textContent = "Generate Random";
+      } else {
+        modeHintEl.textContent = "Valid words checks generated letter arrangements against a free, static dictionary split into small length-based files.";
+        dictionaryStatusEl.textContent = "Local dictionary first; live WordSoHard lookup is used only for remaining candidates.";
+        generateBtn.textContent = "Find Valid Words";
+      }
+    }
+
+    function updateFromInput() {
+      const items = getItems();
+      totalPermutationCount = items.length ? countUniquePermutations(items) : 0n;
+      updateStats();
+    }
+
+    generateBtn.addEventListener("click", generate);
+    randomBtn.addEventListener("click", () => {
+      generationModeEl.value = "random";
+      updateModeHint();
+      generate();
+    });
+    clearBtn.addEventListener("click", clearAll);
+    copyAllBtn.addEventListener("click", copyAll);
+    downloadBtn.addEventListener("click", downloadResults);
+    $("sortAlphaBtn").addEventListener("click", sortAlpha);
+    $("sortReverseBtn").addEventListener("click", sortReverse);
+    $("sortRandomBtn").addEventListener("click", shuffleDisplay);
+    searchEl.addEventListener("input", renderResults);
+    inputEl.addEventListener("input", updateFromInput);
+    typeEl.addEventListener("change", () => {
+      updateModeHint();
+      updateFromInput();
+    });
+    generationModeEl.addEventListener("change", () => {
+      updateModeHint();
+    });
+    removeDuplicatesEl.addEventListener("change", updateFromInput);
+    limitEl.addEventListener("change", () => {
+      if (generatedResults.length) setStatus("Result limit changed. Generate again to apply it.");
+    });
+
+    document.querySelectorAll(".example").forEach(button => {
+      button.addEventListener("click", () => {
+        inputEl.value = button.dataset.value;
+        typeEl.value = button.dataset.type;
+        updateFromInput();
+        generate();
+        $("generator").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+
+    themeToggle.addEventListener("click", () => {
+      const dark = document.documentElement.dataset.theme === "dark";
+      document.documentElement.dataset.theme = dark ? "light" : "dark";
+      themeToggle.textContent = dark ? "☾" : "☀";
+      themeToggle.setAttribute("aria-label", dark ? "Enable dark mode" : "Enable light mode");
+      try { localStorage.setItem("permutation-theme", dark ? "light" : "dark"); } catch {}
+    });
+
+    try {
+      const savedTheme = localStorage.getItem("permutation-theme");
+      if (savedTheme === "dark") {
+        document.documentElement.dataset.theme = "dark";
+        themeToggle.textContent = "☀";
+        themeToggle.setAttribute("aria-label", "Enable light mode");
+      }
+    } catch {}
+
+    updateModeHint();
+    updateFromInput();
+  </script>
+</body>
+</html>
